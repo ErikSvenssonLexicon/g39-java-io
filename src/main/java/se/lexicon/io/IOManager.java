@@ -1,8 +1,11 @@
 package se.lexicon.io;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
-
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class IOManager {
 
@@ -35,6 +38,56 @@ public class IOManager {
             ex.printStackTrace();
         }
     }
+
+    public List<String> write(File destination, List<String> source){
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(destination))){
+            for(int i = 0; i<source.size(); i++){
+                writer.write(source.get(i));
+                if(i != source.size() -1){
+                    writer.newLine();
+                }
+            }
+            writer.flush();
+        }catch (IOException ex){
+            ex.printStackTrace();
+        }
+        return source;
+    }
+
+    public List<String> read(File source){
+        List<String> result = new ArrayList<>();
+        try(BufferedReader reader = new BufferedReader(new FileReader(source))){
+            String line;
+            while((line = reader.readLine()) != null){
+                result.add(line);
+            }
+        }catch (IOException ex){
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    public List<String> readFunctional(String string){
+        List<String> result = new ArrayList<>();
+        try(BufferedReader reader = Files.newBufferedReader(Paths.get(string))){
+            result = reader.lines()
+                    .collect(Collectors.toList());
+        }catch (IOException ex){
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    public List<String> readNio(String path) {
+        try{
+            return Files.lines(Paths.get(path))
+                    .collect(Collectors.toList());
+        }catch (IOException ex){
+            throw new RuntimeException("Something went wrong reading path " + path, ex);
+        }
+    }
+
+
 
 
 
